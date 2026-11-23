@@ -2,12 +2,19 @@
   "name": "multiphone-hub",
   "version": "0.1.0",
   "private": true,
+  "workspaces": [
+    "apps/agent"
+  ],
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "agent:dev": "npm run dev --workspace @multiphone-hub/agent",
+    "agent:build": "npm run build --workspace @multiphone-hub/agent",
+    "agent:start": "npm run start --workspace @multiphone-hub/agent",
+    "agent:typecheck": "npm run typecheck --workspace @multiphone-hub/agent"
   },
   "dependencies": {
     "lucide-react": "^0.468.0",
