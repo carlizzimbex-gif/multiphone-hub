@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import {
-  Activity, Airplay, Battery, Cable, Check, ChevronDown, CircleHelp,
+  Activity, Airplay, Battery, Cable, Check, CircleHelp,
   Command, Grid2X2, Layers3, MonitorSmartphone, MoreHorizontal, Play,
   Plus, Radio, RefreshCw, Search, Settings2, ShieldCheck, Smartphone,
   Wifi, WifiOff, Zap,
