@@ -46,7 +46,7 @@ Open http://localhost:3000.
 In a separate PowerShell window, from the repository root:
 
 ```powershell
-$env:AGENT_TOKEN = node -e "console.log(require('node:crypto').randomBytes(32).toString('hex'))"
+$env:AGENT_TOKEN = (node -e "console.log(require('node:crypto').randomBytes(32).toString('hex'))")
 npm run agent:dev
 ```
 
