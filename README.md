@@ -47,6 +47,7 @@ In a separate PowerShell window, from the repository root:
 
 ```powershell
 $env:AGENT_TOKEN = (node -e "console.log(require('node:crypto').randomBytes(32).toString('hex'))")
+$env:AGENT_ALLOWED_ORIGINS = "https://multiphone-hub-levy-0ed7.vercel.app,https://multiphone-hub.vercel.app,http://localhost:3000"
 npm run agent:dev
 ```
 
@@ -94,7 +95,7 @@ Allowed actions: `home`, `back`, `recents`, `volumeUp`, and `volumeDown`.
 - Device actions use a strict allowlist. Arbitrary shell commands are not accepted.
 - A device must be visible to ADB and in the `device` state before an action is sent.
 - Never put the agent token in frontend code, Git, screenshots, or public messages.
-- The hosted dashboard is not yet connected to the local agent. A secure relay and pairing flow are required before remote browser control.
+- The dashboard can connect to the local agent from the same computer using the private token and the exact allowed browser origin. The browser may ask for permission to access local devices. Do not expose the agent or ADB to the public internet.
 
 ## Roadmap
 
