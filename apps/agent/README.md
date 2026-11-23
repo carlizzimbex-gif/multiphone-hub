@@ -20,6 +20,7 @@ In PowerShell, from the repository root:
 
 ```powershell
 $env:AGENT_TOKEN = (node -e "console.log(require('node:crypto').randomBytes(32).toString('hex'))")
+$env:AGENT_ALLOWED_ORIGINS = "https://multiphone-hub-levy-0ed7.vercel.app,https://multiphone-hub.vercel.app,http://localhost:3000"
 npm run agent:dev
 ```
 
@@ -77,4 +78,6 @@ The agent verifies the device is currently connected and authorized by ADB befor
 - Request bodies are size-limited.
 - Only five fixed Android key events are supported; arbitrary shell commands are not accepted.
 - Do not put the token in browser bundles, Git, screenshots, or public messages.
-- The hosted dashboard is not yet paired to this agent. A separate authenticated relay/pairing design is required before remote control from Vercel.
+- The dashboard connects to this agent only from an exact origin listed in `AGENT_ALLOWED_ORIGINS`; the browser may ask for local-network permission.
+- The token is kept in page memory only and must never be stored in local storage or committed.
+- Never expose the agent or ADB to the public internet.
