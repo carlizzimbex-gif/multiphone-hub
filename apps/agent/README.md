@@ -19,7 +19,7 @@ npm install
 In PowerShell, from the repository root:
 
 ```powershell
-$env:AGENT_TOKEN = node -e "console.log(require('node:crypto').randomBytes(32).toString('hex'))"
+$env:AGENT_TOKEN = (node -e "console.log(require('node:crypto').randomBytes(32).toString('hex'))")
 npm run agent:dev
 ```
 
