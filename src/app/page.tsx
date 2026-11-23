@@ -186,7 +186,7 @@ export default function Home() {
           <div className="panel mt-6 flex flex-col gap-3 p-4 sm:flex-row sm:items-center">
             <div className="min-w-0 flex-1">
               <h2 className="text-sm font-semibold">Connect this computer</h2>
-              <p className="mt-1 text-xs leading-5 text-slate-400">Run the Windows agent, then paste its private token here. The token stays in this page's memory only.</p>
+              <p className="mt-1 text-xs leading-5 text-slate-400">Run the Windows agent, then paste its private token here. The token stays in this page&apos;s memory only.</p>
               {agentError && <p className="mt-2 text-xs text-rose-300">{agentError}</p>}
             </div>
             <div className="flex w-full flex-col gap-2 sm:w-auto sm:min-w-[300px]">
