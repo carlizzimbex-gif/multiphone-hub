@@ -1,6 +1,6 @@
-# MultiPhone Hub — Windows local agent foundation
+# MultiPhone Hub — Windows local agent
 
-This first agent milestone runs on the trusted Windows computer and discovers Android devices through ADB. It binds to loopback only; it is not exposed to the LAN or internet.
+The local agent runs on the trusted Windows computer, discovers Android devices through ADB, and exposes a small authenticated API on loopback only. It is not exposed to the LAN or internet.
 
 ## Requirements
 
@@ -8,39 +8,73 @@ This first agent milestone runs on the trusted Windows computer and discovers An
 - Android SDK Platform Tools (ADB) installed and available on PATH
 - USB debugging enabled on each Android device; approve the computer's RSA prompt
 
-## Run in PowerShell
+## Install from the repository root
 
-From the repository root:
+```powershell
+npm install
+```
 
-    cd apps/agent
-    npm install
-    $env:AGENT_TOKEN = "replace-with-a-long-random-secret"
-    npm run dev
+## Start
 
-In a second PowerShell window, test:
+In PowerShell, from the repository root:
 
-    adb devices
+```powershell
+$env:AGENT_TOKEN = node -e "console.log(require('node:crypto').randomBytes(32).toString('hex'))"
+npm run agent:dev
+```
 
-The agent prints a private bearer token at startup. Keep it secret. It is not stored in the repository. The HTTP API listens only on 127.0.0.1:47831.
+If `AGENT_TOKEN` is omitted, the agent generates a fresh 256-bit token and prints it once at startup. Keep this token private. The API listens only on `127.0.0.1:47831`.
 
 ## API
 
-Send the token in the Authorization header:
+Every request must include:
 
-- GET /health
-- GET /api/devices
+```http
+Authorization: Bearer YOUR_PRIVATE_TOKEN
+```
 
-Example:
+- `GET /health` — agent health.
+- `GET /api/devices` — ADB device list.
+- `POST /api/devices/{deviceId}/actions` — send one allowlisted action.
 
-    $token = $env:AGENT_TOKEN
-    Invoke-RestMethod http://127.0.0.1:47831/api/devices -Headers @{ Authorization = "Bearer $token" }
+Example device discovery:
 
-## Security boundary
+```powershell
+$token = "PASTE_THE_PRIVATE_AGENT_TOKEN_HERE"
+Invoke-RestMethod http://127.0.0.1:47831/api/devices -Headers @{ Authorization = "Bearer $token" }
+```
 
-- Loopback binding only; no public ADB or agent port.
+Example action:
+
+```powershell
+$deviceId = "YOUR_ADB_DEVICE_SERIAL"
+$body = @{ action = "home" } | ConvertTo-Json
+Invoke-RestMethod "http://127.0.0.1:47831/api/devices/$([uri]::EscapeDataString($deviceId))/actions" -Method Post -ContentType "application/json" -Headers @{ Authorization = "Bearer $token" } -Body $body
+```
+
+Allowed actions:
+
+- `home` — Android Home key
+- `back` — Android Back key
+- `recents` — Recent apps
+- `volumeUp` — volume up
+- `volumeDown` — volume down
+
+The agent verifies the device is currently connected and authorized by ADB before sending an action.
+
+## Configuration
+
+- `AGENT_PORT` — optional port; default `47831`, allowed range 1024–65535.
+- `AGENT_TOKEN` — optional private bearer token; must be at least 32 characters. If omitted, a random token is generated.
+- `AGENT_ALLOWED_ORIGINS` — comma-separated exact browser origins; defaults to `http://localhost:3000`.
+- `ADB_PATH` — optional full path to `adb.exe` if ADB is not on PATH.
+
+## Security
+
+- Loopback binding only; never expose ADB or this agent to the public internet.
 - Bearer token required for every endpoint.
-- CORS defaults to the local development dashboard origin.
-- This milestone only reports device discovery. It does not tap, type, install apps, capture screens, or execute arbitrary shell commands.
-- Do not put the token in frontend code, Git, screenshots, or public messages.
-
-For a hosted dashboard, the next milestone must add a separately authenticated relay/pairing flow. Do not expose this local agent directly to the public internet.
+- CORS allows only configured exact origins.
+- Request bodies are size-limited.
+- Only five fixed Android key events are supported; arbitrary shell commands are not accepted.
+- Do not put the token in browser bundles, Git, screenshots, or public messages.
+- The hosted dashboard is not yet paired to this agent. A separate authenticated relay/pairing design is required before remote control from Vercel.
